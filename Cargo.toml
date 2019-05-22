@@ -1,0 +1,10 @@
+[package]
+name = "playrs"
+version = "0.1.0"
+authors = ["Ivan Velichko <ivan.velichko@moovel.com>"]
+edition = "2018"
+
+[dependencies]
+regex = "1"
+structopt = "0.2.10"
+
