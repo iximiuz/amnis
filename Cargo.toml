@@ -1,10 +1,11 @@
 [package]
-name = "playrs"
-version = "0.1.0"
-authors = ["Ivan Velichko <ivan.velichko@moovel.com>"]
+name = "st"
+version = "0.0.1"
+authors = ["Ivan Velichko <iximiuz@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+chrono = "0.4.11"
 regex = "1"
 structopt = "0.2.10"
 
