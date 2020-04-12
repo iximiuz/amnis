@@ -1,5 +1,5 @@
 [package]
-name = "st"
+name = "amnis"
 version = "0.0.1"
 authors = ["Ivan Velichko <iximiuz@gmail.com>"]
 edition = "2018"

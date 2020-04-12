@@ -1,11 +1,10 @@
 use std::collections::HashMap;
-use std::io::{self, BufRead, BufReader, Write};
 
-extern crate chrono;
 use chrono::DateTime;
-
-extern crate regex;
 use regex::Regex;
+
+use amnis::input::Input;
+use amnis::output::Output;
 
 // Nginx log stream use case:
 //   Show request rate (per second/minute/etc)
@@ -23,7 +22,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("amnis 0.0.1");
 
     let mut input = BufReader::new(io::stdin());
-    let mut output = io::BufWriter::new(io::stdout());
 
     let bin_interval = 60 * 60;
     // let group_by = ("method", "URL", "status_code");
