@@ -40,7 +40,7 @@ struct Bucket((Key, LineNum), VecDeque<Record>);
 
 // define buffer in terms of number of records, diff of record values, memory size?
 // for each line:
-//   extract key 
+//   extract key
 //   find first bucket record can be placed to
 //   if bucket found:
 //     push record to bucket
@@ -100,7 +100,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Some() => last_key <= &key,
             None => unreachable!("empty bucket is not allowed"),
         }) {
-            buckets.peek_mut(idx).unwrap().push_back(Record(key, line_no, line));
+            buckets
+                .peek_mut(idx)
+                .unwrap()
+                .push_back(Record(key, line_no, line));
         } else {
             let mut bucket = VecDeque::new();
             bucket.push_back(Record(key, line_no, line));
@@ -120,3 +123,84 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     Ok(())
 }
+
+// use std::collections::HashMap;
+// use chrono::DateTime;
+
+// let bin_interval = 60 * 60;
+// let group_by = ("method", "URL", "status_code");
+
+// let mut line_no = 0;
+// let mut prev_bin = 0;
+// let mut agg: HashMap<String, i64> = HashMap::new();
+// loop {
+//     let mut vec = Vec::new();
+//     let len = input.read_until(b'\n', &mut vec)?;
+//     if len == 0 {
+//         break;
+//     }
+//     line_no += 1;
+
+//     let line = String::from_utf8(vec)?;
+//     if line == "\n" {
+//         continue;
+//     }
+
+//     let caps = match re.captures(&line) {
+//         Some(caps) => caps,
+//         None => {
+//             eprintln!("line {} pattern not found: {}", line_no, line);
+//             continue;
+//         }
+//     };
+
+//     let time = match caps.name("time") {
+//         Some(x) => x.as_str(),
+//         None => {
+//             eprintln!("line {} does't have time", line_no);
+//             continue;
+//         }
+//     };
+//     let timestamp = DateTime::parse_from_str(time, "%d/%h/%Y:%H:%M:%S %z")?.timestamp();
+
+//     let method = match caps.name("method") {
+//         Some(x) => x.as_str(),
+//         None => "<no method>",
+//     };
+//     let status_code = match caps.name("status_code") {
+//         Some(x) => x.as_str(),
+//         None => "<no status code>",
+//     };
+//     let url = match caps.name("url") {
+//         Some(x) => x.as_str(),
+//         None => "<no url>",
+//     };
+
+//     // write!(
+//     //     output,
+//     //     "DEBUG: line {}: len={}, time={}, timestamp={}, method={}, status_code={}, URL={}\n",
+//     //     line_no, len, time, timestamp, method, status_code, url,
+//     // )?;
+
+//     let bin = bin(timestamp, bin_interval);
+//     if bin != prev_bin {
+//         prev_bin = bin;
+//         if !agg.is_empty() {
+//             write!(output, "{} {:?}\n\n", prev_bin, agg)?;
+//         }
+//         agg.clear();
+//     }
+
+//     *agg.entry("total".to_owned()).or_insert(0) += 1;
+//     *agg.entry(method.to_owned()).or_insert(0) += 1;
+//     *agg.entry(status_code.to_owned()).or_insert(0) += 1;
+//     *agg.entry(url.to_owned()).or_insert(0) += 1;
+
+//     output.flush()?;
+// }
+
+// write!(output, "{} {:?}\n", prev_bin, agg)?;
+
+// fn bin(key: i64, interval: i64) -> i64 {
+//     return (key / interval) * interval;
+// }
