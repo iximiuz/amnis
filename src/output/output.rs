@@ -40,13 +40,13 @@ impl From<io::Error> for Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub struct Output<W, E> {
-    writer: W,
-    encoder: E,
+pub struct Output {
+    writer: Box<dyn Writer>,
+    encoder: Box<dyn Encoder>,
 }
 
-impl<W: Writer, E: Encoder> Output<W, E> {
-    pub fn new(writer: W, encoder: E) -> Self {
+impl Output {
+    pub fn new(writer: Box<dyn Writer>, encoder: Box<dyn Encoder>) -> Self {
         Self { writer, encoder }
     }
 

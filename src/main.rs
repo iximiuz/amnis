@@ -4,7 +4,7 @@ use regex::bytes::Regex;
 use structopt::StructOpt;
 
 use amnis::decoder::{self, Decoder};
-use amnis::encoder;
+use amnis::encoder::{self, Encoder};
 use amnis::input::{Input, LineReader};
 use amnis::output::{LineWriter, Output};
 
@@ -43,17 +43,14 @@ struct CliOpt {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opt = CliOpt::from_args();
 
-    let pattern = r#"^[^\[]+\[(?P<time>[^]]+)\]\s+"(?P<method>[A-Z]+)\s+(?P<url>.+)\s+HTTP.+"\s+(?P<status_code>\d+)\s+"#;
-    let re = Regex::new(pattern)?;
-
     let mut input = Input::new(
-        LineReader::new(BufReader::new(io::stdin())),
-        create_decoder(&opt),
+        Box::new(LineReader::new(BufReader::new(io::stdin()))),
+        create_decoder(&opt)?,
     );
 
     let mut output = Output::new(
-        LineWriter::new(BufWriter::new(io::stdout())),
-        encoder::influxdb::LineProto::new(),
+        Box::new(LineWriter::new(BufWriter::new(io::stdout()))),
+        create_encoder(&opt)?,
     );
 
     // let mut pipeline = Pipeline::new(input, [], output);
@@ -66,9 +63,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn create_decoder(opt: &CliOpt) -> Decoder {
-    if opt.decode == "json" {
-        return decoder::Json();
-    }
-    decoder::Regex::new(re)
+fn create_decoder(opt: &CliOpt) -> Result<Box<dyn Decoder>, Box<dyn std::error::Error>> {
+    // if opt.decode == "json" {
+    //     return decoder::Json();
+    // }
+    let pattern = r#"^[^\[]+\[(?P<time>[^]]+)\]\s+"(?P<method>[A-Z]+)\s+(?P<url>.+)\s+HTTP.+"\s+(?P<status_code>\d+)\s+"#;
+    let re = Regex::new(pattern)?;
+
+    Ok(Box::new(decoder::Regex::new(re)))
+}
+
+fn create_encoder(opt: &CliOpt) -> Result<Box<dyn Encoder>, Box<dyn std::error::Error>> {
+    Ok(Box::new(encoder::influxdb::LineProto::new()))
 }

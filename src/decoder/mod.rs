@@ -2,11 +2,16 @@ use std::{error, fmt};
 
 use crate::sample::Sample;
 
+mod json;
+pub use self::json::Json;
+
 mod regex;
 pub use self::regex::Regex;
 
 #[derive(Debug)]
-pub struct Error;
+pub enum Error {
+    Format(Box<dyn error::Error>),
+}
 
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {

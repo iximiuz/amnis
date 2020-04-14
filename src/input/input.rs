@@ -39,13 +39,13 @@ impl From<io::Error> for Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub struct Input<R, D> {
-    reader: R,
-    decoder: D,
+pub struct Input {
+    reader: Box<dyn Reader>,
+    decoder: Box<dyn Decoder>,
 }
 
-impl<R: Reader, D: Decoder> Input<R, D> {
-    pub fn new(reader: R, decoder: D) -> Self {
+impl Input {
+    pub fn new(reader: Box<dyn Reader>, decoder: Box<dyn Decoder>) -> Self {
         Self { reader, decoder }
     }
 
