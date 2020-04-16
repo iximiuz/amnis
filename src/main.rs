@@ -1,6 +1,5 @@
 use std::io::{self, BufReader, BufWriter};
 
-use regex::bytes::Regex;
 use structopt::StructOpt;
 
 use amnis::decoder::{self, Decoder};
@@ -67,21 +66,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     loop {
         let sample = input.read()?;
         output.write(sample)?;
+        if false {
+            break;
+        }
     }
 
     Ok(())
 }
 
-fn create_decoder(opt: &CliOpt) -> Result<Box<dyn Decoder>, Box<dyn std::error::Error>> {
+fn create_decoder(_opt: &CliOpt) -> Result<Box<dyn Decoder>, Box<dyn std::error::Error>> {
     // if opt.decode == "json" {
     //     return decoder::Json();
     // }
-    let pattern = r#"^[^\[]+\[(?P<time>[^]]+)\]\s+"(?P<method>[A-Z]+)\s+(?P<url>.+)\s+HTTP.+"\s+(?P<status_code>\d+)\s+"#;
-    let re = Regex::new(pattern)?;
-
-    Ok(Box::new(decoder::Regex::new(re)))
+    Ok(Box::new(decoder::Regex::new("foo")?))
 }
 
-fn create_encoder(opt: &CliOpt) -> Result<Box<dyn Encoder>, Box<dyn std::error::Error>> {
+fn create_encoder(_opt: &CliOpt) -> Result<Box<dyn Encoder>, Box<dyn std::error::Error>> {
     Ok(Box::new(encoder::influxdb::LineProto::new()))
 }

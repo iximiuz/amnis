@@ -26,8 +26,12 @@ pub struct Regex {
 }
 
 impl Regex {
-    pub fn new(re: RE) -> Self {
-        Self { re }
+    pub fn new(re: &str) -> std::result::Result<Self, Box<dyn error::Error>> {
+        let compiled_re = RE::new(re)?;
+        let tmp: Vec<_> = compiled_re.capture_names().collect();
+        println!("{:?}", tmp);
+        println!("{:?}", compiled_re.capture_locations());
+        Ok(Self { re: compiled_re })
     }
 }
 
@@ -39,5 +43,17 @@ impl Decoder for Regex {
         };
         println!("REGEX: {:?}", caps);
         Ok(Sample::new())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let re = r#"^[^\[]+\[(?P<time>[^]]+)\]\s+"([A-Z]+)\s+(?P<url>.+)\s+HTTP.+"\s+(?P<status_code>\d+)\s+"#;
+        let decoder = Regex::new(re);
+        assert_eq!(2 + 2, 4);
     }
 }
