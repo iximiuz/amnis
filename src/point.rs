@@ -1,6 +1,6 @@
-pub struct Sample;
+pub struct Point;
 
-impl Sample {
+impl Point {
     pub fn new() -> Self {
         Self {}
     }

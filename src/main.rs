@@ -1,10 +1,9 @@
-use std::io::{self, BufReader, BufWriter};
+use std::io::{self, BufWriter};
 
 use structopt::StructOpt;
 
-use amnis::decoder::{self, Decoder};
 use amnis::encoder::{self, Encoder};
-use amnis::input::{Input, LineReader};
+use amnis::input::Input;
 use amnis::output::{LineWriter, Output};
 
 // Nginx log stream use case:
@@ -41,8 +40,8 @@ use amnis::output::{LineWriter, Output};
 #[derive(Debug, StructOpt)]
 #[structopt(name = "amnis", about = "amnis command line arguments")]
 struct CliOpt {
-    #[structopt(long = "decode", short = "d")]
-    decode: String,
+    #[structopt(long = "input", short = "i")]
+    input: String,
 
     #[structopt(long = "encode", short = "e")]
     encode: String,
@@ -51,10 +50,7 @@ struct CliOpt {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opt = CliOpt::from_args();
 
-    let mut input = Input::new(
-        Box::new(LineReader::new(BufReader::new(io::stdin()))),
-        create_decoder(&opt)?,
-    );
+    let mut input = Input::from_json(&opt.input)?;
 
     let mut output = Output::new(
         Box::new(LineWriter::new(BufWriter::new(io::stdout()))),
@@ -72,13 +68,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
-}
-
-fn create_decoder(_opt: &CliOpt) -> Result<Box<dyn Decoder>, Box<dyn std::error::Error>> {
-    // if opt.decode == "json" {
-    //     return decoder::Json();
-    // }
-    Ok(Box::new(decoder::Regex::new("foo")?))
 }
 
 fn create_encoder(_opt: &CliOpt) -> Result<Box<dyn Encoder>, Box<dyn std::error::Error>> {

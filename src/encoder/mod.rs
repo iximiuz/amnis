@@ -2,7 +2,7 @@ pub mod influxdb;
 
 use std::{error, fmt};
 
-use crate::sample::Sample;
+use crate::point::Point;
 
 #[derive(Debug)]
 pub struct Error;
@@ -22,5 +22,5 @@ impl error::Error for Error {
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub trait Encoder {
-    fn encode(&self, sample: Sample) -> Result<Vec<u8>>;
+    fn encode(&self, sample: Point) -> Result<Vec<u8>>;
 }

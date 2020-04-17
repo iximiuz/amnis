@@ -2,6 +2,7 @@ use std::io::{self, BufRead};
 
 pub trait Reader {
     fn read(&mut self, buf: &mut Vec<u8>) -> io::Result<usize>;
+    fn kind(&self) -> &str;
 }
 
 pub struct LineReader<R> {
@@ -25,6 +26,10 @@ impl<R: BufRead> LineReader<R> {
 impl<R: BufRead> Reader for LineReader<R> {
     fn read(&mut self, buf: &mut Vec<u8>) -> io::Result<usize> {
         self.inner.read_until(self.delim, buf)
+    }
+
+    fn kind(&self) -> &str {
+        "LineReader"
     }
 }
 

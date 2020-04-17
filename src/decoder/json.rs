@@ -1,27 +1,31 @@
 use serde_json;
 
-use crate::sample::Sample;
+use crate::point::Point;
 
-use super::{Decoder, Error, Result};
+use super::{DecodeError, Decoder};
 
-impl From<serde_json::error::Error> for Error {
-    fn from(err: serde_json::error::Error) -> Error {
-        Error::Format(Box::new(err))
+impl From<serde_json::error::Error> for DecodeError {
+    fn from(err: serde_json::error::Error) -> Self {
+        Self::Format(Box::new(err))
     }
 }
 
-pub struct Json {}
+pub struct JsonDecoder {}
 
-impl Json {
+impl JsonDecoder {
     pub fn new() -> Self {
         Self {}
     }
 }
 
-impl Decoder for Json {
-    fn decode(&self, buf: &[u8]) -> Result<Sample> {
+impl Decoder for JsonDecoder {
+    fn decode(&self, buf: &[u8]) -> Result<Point, DecodeError> {
         let v = serde_json::from_slice(buf)?;
         println!("JSON: {:?}", v);
-        Ok(Sample::new())
+        Ok(Point::new())
+    }
+
+    fn kind(&self) -> &str {
+        "JsonDecoder"
     }
 }

@@ -1,7 +1,7 @@
 use std::{error, fmt, io};
 
 use crate::encoder::{Encoder, Error as EncodeError};
-use crate::sample::Sample;
+use crate::point::Point;
 
 use super::writer::Writer;
 
@@ -50,7 +50,7 @@ impl Output {
         Self { writer, encoder }
     }
 
-    pub fn write(&mut self, sample: Sample) -> Result<()> {
+    pub fn write(&mut self, sample: Point) -> Result<()> {
         let buf = self.encoder.encode(sample)?;
         self.writer.write(&buf)?;
         Ok(())

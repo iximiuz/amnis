@@ -1,7 +1,7 @@
 // Implements InfluxDB line protocol
 // see https://docs.influxdata.com/influxdb/latest/write_protocols/line_protocol_tutorial/
 
-use crate::sample::Sample;
+use crate::point::Point;
 
 use super::{Encoder, Result};
 
@@ -14,7 +14,7 @@ impl LineProto {
 }
 
 impl Encoder for LineProto {
-    fn encode(&self, _sample: Sample) -> Result<Vec<u8>> {
+    fn encode(&self, _sample: Point) -> Result<Vec<u8>> {
         Ok(vec![48, 49, 50])
     }
 }
