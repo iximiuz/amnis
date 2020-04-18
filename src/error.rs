@@ -51,24 +51,6 @@ impl From<&str> for Error {
     }
 }
 
-// impl From<Box<dyn error::Error>> for Error {
-//     fn from(err: Box<dyn error::Error>) -> Self {
-//         Self {
-//             message: "Unexpected error occurred".into(),
-//             source: Some(err),
-//         }
-//     }
-// }
-
-impl<E: Into<Box<dyn error::Error>>> From<E> for Error {
-    fn from(err: E) -> Self {
-        Self {
-            message: "Unexpected error occurred".into(),
-            source: Some(err),
-        }
-    }
-}
-
 impl<E: error::Error + 'static> From<(&str, E)> for Error {
     fn from((message, err): (&str, E)) -> Self {
         Self {

@@ -50,18 +50,16 @@ mod tests {
     }
 
     #[test]
-    fn input_create_simple() -> Result<()> {
+    fn input_create_simple() {
         //   -i '{"re": "(\d+)\s(\w)", "multiline": {"re": "\d4-\d2\d2", "negative": true}, "t:ts": "$1:%Y-%m-%dT%H:%I:%S", "l:num": "$1:i"}' \
-        let input = Input::from_json(r#"{"decode": "re"}"#)?;
+        let input = Input::from_json(r#"{"decode": "re"}"#).unwrap();
         assert_eq!(input.decoder_kind(), "RegexDecoder");
         assert_eq!(input.reader_kind(), "LineReader");
-        Ok(())
     }
 
     #[test]
-    fn decoder_create_regex() -> Result<()> {
-        let d = create_decoder(&serde_json::from_str("{}").map_err(|e| From::from(e))?)?;
+    fn decoder_create_regex() {
+        let d = create_decoder(&serde_json::from_str("{}").unwrap()).unwrap();
         println!("{}", d.kind());
-        Ok(())
     }
 }

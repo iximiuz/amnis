@@ -10,7 +10,7 @@ pub struct RegexDecoder {
 
 impl RegexDecoder {
     pub fn new(re: &str) -> Result<Self> {
-        let compiled_re = Regex::new(re)?;
+        let compiled_re = Regex::new(re).map_err(|e| ("Bad regex pattern", e))?;
         let tmp: Vec<_> = compiled_re.capture_names().collect();
         println!("{:?}", tmp);
         println!("{:?}", compiled_re.capture_locations());
