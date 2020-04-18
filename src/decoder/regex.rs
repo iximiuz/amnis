@@ -1,31 +1,15 @@
-use std::{error, fmt};
-
 use regex::bytes::Regex;
 
 use super::{DecodeError, Decoder};
+use crate::error::{Error, Result};
 use crate::point::Point;
-
-#[derive(Debug)]
-struct StringError(&'static str);
-
-impl error::Error for StringError {
-    fn description(&self) -> &str {
-        &self.0
-    }
-}
-
-impl fmt::Display for StringError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Display::fmt(&self.0, f)
-    }
-}
 
 pub struct RegexDecoder {
     re: Regex,
 }
 
 impl RegexDecoder {
-    pub fn new(re: &str) -> std::result::Result<Self, Box<dyn error::Error>> {
+    pub fn new(re: &str) -> Result<Self> {
         let compiled_re = Regex::new(re)?;
         let tmp: Vec<_> = compiled_re.capture_names().collect();
         println!("{:?}", tmp);
@@ -35,9 +19,9 @@ impl RegexDecoder {
 }
 
 impl Decoder for RegexDecoder {
-    fn decode(&self, buf: &[u8]) -> Result<Point, DecodeError> {
+    fn decode(&self, buf: &[u8]) -> std::result::Result<Point, DecodeError> {
         let caps = match self.re.captures(buf) {
-            None => return Err(DecodeError::Format(Box::new(StringError("no match")))),
+            None => return Err(DecodeError::Format(Box::new(Error::new("no match")))),
             Some(x) => x,
         };
         println!("REGEX: {:?}", caps);
