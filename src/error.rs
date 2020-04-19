@@ -1,6 +1,5 @@
 use std::{error, fmt};
 
-#[derive(Debug)]
 pub struct Error {
     message: String,
     source: Option<Box<dyn error::Error>>,
@@ -12,6 +11,12 @@ impl Error {
             message: message.into(),
             source: None,
         }
+    }
+}
+
+impl fmt::Debug for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Unexpected error: {}", self)
     }
 }
 

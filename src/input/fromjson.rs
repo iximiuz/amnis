@@ -1,6 +1,6 @@
 use std::io::{self, BufReader};
 
-use serde_json::Value as JsonValue;
+use serde_json::{Map, Value as JsonValue};
 
 use super::input::Input;
 use super::reader;
@@ -9,37 +9,75 @@ use crate::error::Result;
 
 impl Input {
     pub fn from_json(json: &str) -> Result<Self> {
-        let config = serde_json::from_str(json).map_err(|e| ("Malformed JSON", e))?;
+        let config = json_parse(json)?;
         Ok(Self::new(create_reader(&config)?, create_decoder(&config)?))
     }
 }
 
-fn create_reader(_config: &JsonValue) -> Result<Box<dyn reader::Reader>> {
+type JsonConfig = Map<String, JsonValue>;
+
+fn json_parse(json: &str) -> Result<JsonConfig> {
+    use JsonValue::*;
+
+    match serde_json::from_str(json) {
+        Ok(Object(obj)) => Ok(obj),
+        Err(err) => Err(("Malformed JSON", err).into()),
+        _ => Err("JSON object expected".into()),
+    }
+}
+
+fn json_get_str_attr<'a>(config: &'a JsonConfig, attr: &str) -> Result<&'a str> {
+    match config.get(attr) {
+        Some(JsonValue::String(val)) => Ok(val),
+        None => Err(format!(r#"missing "{}" attribute"#, attr).into()),
+        _ => Err(format!(r#""{}" attribute must be string"#, attr).into()),
+    }
+}
+
+fn create_reader(_config: &JsonConfig) -> Result<Box<dyn reader::Reader>> {
     Ok(Box::new(reader::LineReader::new(BufReader::new(
         io::stdin(),
     ))))
 }
 
-fn create_decoder(config: &JsonValue) -> Result<Box<dyn decoder::Decoder>> {
-    use JsonValue::*;
-
-    match config["decode"] {
-        String(ref kind) => match kind.as_str() {
-            "re" => Ok(Box::new(decoder::RegexDecoder::new("foo")?)),
-            "json" => Ok(Box::new(decoder::JsonDecoder::new())),
-            _ => Err("unsupported \"decode\" type".into()),
-        },
-        Null => Err("missing \"decode\" attribute".into()),
-        _ => Err("\"decode\" attribute must be string".into()),
+fn create_decoder(config: &JsonConfig) -> Result<Box<dyn decoder::Decoder>> {
+    match json_get_str_attr(config, "decode")? {
+        "re" => create_decoder_re(config),
+        "json" => create_decoder_json(config),
+        _ => Err(r#"unsupported "decode" type"#.into()),
     }
+}
+
+fn create_decoder_re(config: &JsonConfig) -> Result<Box<dyn decoder::Decoder>> {
+    // TODO: parse timestamp field
+    // TODO: parse all label fields
+    // TODO: parse all regular fields
+    Ok(Box::new(decoder::RegexDecoder::new(
+        json_get_str_attr(config, "re")?,
+        None,
+        vec![],
+        vec![],
+    )?))
+}
+
+fn create_decoder_json(_config: &JsonConfig) -> Result<Box<dyn decoder::Decoder>> {
+    Ok(Box::new(decoder::JsonDecoder::new()))
 }
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     #[test]
-    fn malformed_json() {
+    fn input_create_simple() {
+        //   -i '{"re": "(\d+)\s(\w)", "multiline": {"re": "\d4-\d2\d2", "negative": true}, "t:ts": "$1:%Y-%m-%dT%H:%I:%S", "l:num": "$1:i"}' \
+        Input::from_json(r#"{"decode": "re", "re": "(.*)"}"#).expect("Input creation must succeed");
+    }
+
+    #[test]
+    fn input_create_malformed_json() {
         match Input::from_json("foobar") {
             Err(e) => assert_eq!(
                 e.to_string(),
@@ -50,16 +88,15 @@ mod tests {
     }
 
     #[test]
-    fn input_create_simple() {
-        //   -i '{"re": "(\d+)\s(\w)", "multiline": {"re": "\d4-\d2\d2", "negative": true}, "t:ts": "$1:%Y-%m-%dT%H:%I:%S", "l:num": "$1:i"}' \
-        let input = Input::from_json(r#"{"decode": "re"}"#).unwrap();
-        assert_eq!(input.decoder_kind(), "RegexDecoder");
-        assert_eq!(input.reader_kind(), "LineReader");
+    fn decoder_create_regex() {
+        create_decoder(&cfg(json!({"decode": "re", "re": "(.*)"})))
+            .expect("Decoder creating must succeed");
     }
 
-    #[test]
-    fn decoder_create_regex() {
-        let d = create_decoder(&serde_json::from_str("{}").unwrap()).unwrap();
-        println!("{}", d.kind());
+    fn cfg(c: JsonValue) -> JsonConfig {
+        match c {
+            JsonValue::Object(obj) => obj,
+            _ => unreachable!(),
+        }
     }
 }
