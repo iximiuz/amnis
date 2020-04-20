@@ -2,9 +2,7 @@ use std::io::{self, BufWriter};
 
 use structopt::StructOpt;
 
-use amnis::encoder::{self, Encoder};
-use amnis::input::Input;
-use amnis::output::{LineWriter, Output};
+use amnis::pipeline::Pipeline;
 
 // Nginx log stream use case:
 //   Show request rate (per second/minute/etc)
@@ -43,33 +41,15 @@ struct CliOpt {
     #[structopt(long = "input", short = "i")]
     input: String,
 
-    #[structopt(long = "encode", short = "e")]
-    encode: String,
+    #[structopt(long = "output", short = "o")]
+    output: String,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opt = CliOpt::from_args();
 
-    let mut input = Input::from_json(&opt.input)?;
-
-    let mut output = Output::new(
-        Box::new(LineWriter::new(BufWriter::new(io::stdout()))),
-        create_encoder(&opt)?,
-    );
-
-    // let mut pipeline = Pipeline::new(input, [], output);
-    // pipeline.run()
-    loop {
-        let sample = input.read()?;
-        output.write(sample)?;
-        if false {
-            break;
-        }
-    }
+    let pipeline = Pipeline::from_json(&opt.input, vec![], vec![&opt.output]);
+    pipeline.run();
 
     Ok(())
-}
-
-fn create_encoder(_opt: &CliOpt) -> Result<Box<dyn Encoder>, Box<dyn std::error::Error>> {
-    Ok(Box::new(encoder::influxdb::LineProto::new()))
 }
