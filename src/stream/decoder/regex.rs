@@ -2,11 +2,10 @@ use std::collections::{HashMap, HashSet};
 
 use regex::bytes::Regex;
 
-use super::{
-    Attribute, DecodeError, Decoder, DescriptorField, DescriptorLabel, DescriptorTimestamp,
+use crate::error::Result;
+use crate::stream::point::{
+    Attribute, DescriptorField, DescriptorLabel, DescriptorTimestamp, Point,
 };
-use crate::error::{Error, Result};
-use crate::point::Point;
 
 type Position = usize;
 
@@ -19,7 +18,7 @@ impl CaptureField {
     pub fn new(name: String, data_type: String, pos: Option<Position>) -> Self {
         Self {
             pos,
-            descriptor: DescriptorField { name, data_type },
+            descriptor: DescriptorField::new(name, data_type),
         }
     }
 }
@@ -98,20 +97,20 @@ impl RegexDecoder {
     }
 }
 
-impl Decoder for RegexDecoder {
-    fn decode(&self, buf: &[u8]) -> std::result::Result<Point, DecodeError> {
-        let caps = match self.re.captures(buf) {
-            None => return Err(DecodeError::Format(Box::new(Error::new("no match")))),
-            Some(x) => x,
-        };
-        println!("REGEX: {:?}", caps);
-        Ok(Point::new())
-    }
-
-    fn kind(&self) -> &str {
-        "RegexDecoder"
-    }
-}
+// impl Decoder for RegexDecoder {
+//     fn decode(&self, buf: &[u8]) -> std::result::Result<Point, DecodeError> {
+//         let caps = match self.re.captures(buf) {
+//             None => return Err(DecodeError::Format(Box::new(Error::new("no match")))),
+//             Some(x) => x,
+//         };
+//         println!("REGEX: {:?}", caps);
+//         Ok(Point::new())
+//     }
+//
+//     fn kind(&self) -> &str {
+//         "RegexDecoder"
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

@@ -1,5 +1,4 @@
 mod decoder;
-mod descriptors;
 mod encoder;
 mod input;
 mod output;

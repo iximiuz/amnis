@@ -1,5 +1,3 @@
-use std::io::{self, BufWriter};
-
 use structopt::StructOpt;
 
 use amnis::pipeline::Pipeline;
@@ -48,8 +46,8 @@ struct CliOpt {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opt = CliOpt::from_args();
 
-    let pipeline = Pipeline::from_json(&opt.input, vec![], vec![&opt.output]);
-    pipeline.run();
+    let mut pipeline = Pipeline::from_json(&opt.input, &[], &[&opt.output])?;
+    pipeline.run()?;
 
     Ok(())
 }

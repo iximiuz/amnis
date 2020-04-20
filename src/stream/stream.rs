@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use super::point::Point;
 use crate::error::Result;
 
@@ -13,14 +15,14 @@ use crate::error::Result;
 pub struct StreamId(u32);
 
 pub trait Stream {
-    fn id(&self) -> StreamId;
+    fn id(&self) -> &StreamId;
     fn process(&mut self) -> Result<()>;
 }
 
 pub trait Inlet {
-    fn push(&mut self, origin: StreamId, point: Point);
+    fn push(&mut self, origin: StreamId, point: Rc<Point>);
 }
 
 pub trait Outlet {
-    fn pipe(&mut self, inlet: Box<dyn Inlet>);
+    fn pipe(&mut self, inlet: Rc<dyn Inlet>);
 }
