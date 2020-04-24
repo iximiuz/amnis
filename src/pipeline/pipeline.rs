@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::stream::Stream;
 
 pub struct Pipeline {
-    queue: Vec<Box<dyn Stream>>,
+    queue: Vec<Box<Stream>>,
 }
 
 impl Pipeline {
@@ -13,7 +13,7 @@ impl Pipeline {
     pub fn run(&mut self) -> Result<()> {
         loop {
             for s in self.queue.iter_mut() {
-                s.process();
+                s.produce();
             }
         }
     }

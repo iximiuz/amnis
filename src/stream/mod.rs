@@ -6,4 +6,4 @@ mod point;
 mod stream;
 
 pub use point::Point;
-pub use stream::{Inlet, Outlet, Stream, StreamId};
+pub use stream::{Inbound, Inlet, Outlet, Producer, Stream};
