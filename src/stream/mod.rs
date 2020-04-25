@@ -1,9 +1,11 @@
-mod decoder;
-mod encoder;
-mod input;
-mod output;
-mod point;
-mod stream;
+pub mod decoder;
+pub mod encoder;
+pub mod input;
+pub mod output;
+pub mod producer;
 
+mod point;
 pub use point::Point;
-pub use stream::{Inbound, Inlet, Outlet, Producer, Stream};
+
+mod stream;
+pub use stream::{Stream, StreamId};

@@ -1,17 +1,48 @@
-use std::io::{self, BufReader};
+use std::io::{self, BufReader, BufWriter};
 
-use serde_json::{Map, Value as JsonValue};
+// use serde_json::{Map, Value as JsonValue};
 
-use super::pipeline::Pipeline;
+use super::pipeline::{Pipeline, PipelineBuilder};
 use crate::error::Result;
-// use crate::stream::decoder;
-// use crate::stream::input::{reader, Input};
+use crate::stream::decoder::JsonDecoder;
+use crate::stream::encoder::JsonEncoder;
+use crate::stream::input::{Input, LineReader};
+use crate::stream::output::{LineWriter, Output};
+use crate::stream::producer::ProducerStream;
 
 impl Pipeline {
-    pub fn from_json(input: &str, streams: &[&str], outputs: &[&str]) -> Result<Self> {
+    pub fn from_json(_input: &str, _streams: &[&str], _outputs: &[&str]) -> Result<Self> {
         // let config = json_parse(json)?;
         // Ok(Self::new(create_reader(&config)?, create_decoder(&config)?))
-        Ok(Self::new())
+        let mut builder = PipelineBuilder::new();
+        builder
+            .add_stream(
+                vec![],
+                Box::new(ProducerStream::new(
+                    0,
+                    Box::new(Input::new(Box::new(LineReader::new(BufReader::new(
+                        io::stdin(),
+                    ))))),
+                )),
+            )
+            .add_stream(
+                vec![0.into()],
+                Box::new(ProducerStream::new(1, Box::new(JsonDecoder::new()))),
+            )
+            .add_stream(
+                vec![1.into()],
+                Box::new(ProducerStream::new(2, Box::new(JsonEncoder::new()))),
+            )
+            .add_stream(
+                vec![2.into()],
+                Box::new(ProducerStream::new(
+                    3,
+                    Box::new(Output::new(Box::new(LineWriter::new(BufWriter::new(
+                        io::stdout(),
+                    ))))),
+                )),
+            );
+        Ok(builder.build())
     }
 }
 

@@ -3,9 +3,7 @@ use std::collections::{HashMap, HashSet};
 use regex::bytes::Regex;
 
 use crate::error::Result;
-use crate::stream::point::{
-    Attribute, DescriptorField, DescriptorLabel, DescriptorTimestamp, Point,
-};
+use crate::stream::point::{Attribute, DescriptorField, DescriptorLabel, DescriptorTimestamp};
 
 type Position = usize;
 
@@ -49,7 +47,7 @@ impl RegexDecoder {
         // println!("{:?}", re.capture_names().collect::<Vec<_>>());
         Self::validate_capture_positions(timestamp, labels, fields, re.captures_len())?;
 
-        for pos in &[1..re.captures_len()] {}
+        for _pos in &[1..re.captures_len()] {}
 
         Ok(Self {
             re,

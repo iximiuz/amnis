@@ -1,6 +1,7 @@
 use super::reader::Reader;
 use crate::error::Result;
-use crate::stream::{Inbound, Point, Producer};
+use crate::stream::producer::{Inbound, Producer};
+use crate::stream::Point;
 
 pub struct Input {
     reader: Box<dyn Reader>,
@@ -13,10 +14,10 @@ impl Input {
 }
 
 impl Producer for Input {
-    fn produce(&mut self, _buf: &mut dyn Inbound) -> Result<Option<Point>> {
-        //     let mut buf = Vec::new();
-        //     self.reader.read(&mut buf)?;
-        //     let point = self.decoder.decode(&buf)?;
-        Ok(None)
+    fn produce(&mut self, _buf: &mut dyn Inbound) -> Result<Vec<Point>> {
+        println!("Input::produce()");
+        let mut buf = Vec::new();
+        self.reader.read(&mut buf).expect("panic!");
+        Ok(vec![Point::new()])
     }
 }
