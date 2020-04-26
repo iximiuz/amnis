@@ -22,3 +22,5 @@ value         field
 label         tag
 metric        measurement
 series        series
+
+https://github.com/SoptikHa2/desed/
